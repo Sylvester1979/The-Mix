@@ -10,10 +10,23 @@ export default function Tooltip({
   className = ''
 }) {
   const [isVisible, setIsVisible] = useState(false);
+  const [isFadedIn, setIsFadedIn] = useState(false);  // Controls opacity for fade-in transition
   const [tooltipPosition, setTooltipPosition] = useState(position);
   const [coords, setCoords] = useState({ top: 0, left: 0 });
   const tooltipRef = useRef(null);
   const containerRef = useRef(null);
+  const showTimeoutRef = useRef(null);
+  const appearanceDelayRef = useRef(null);
+  const fadeInTimerRef = useRef(null);
+
+  // Cleanup all timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (showTimeoutRef.current) clearTimeout(showTimeoutRef.current);
+      if (appearanceDelayRef.current) clearTimeout(appearanceDelayRef.current);
+      if (fadeInTimerRef.current) clearTimeout(fadeInTimerRef.current);
+    };
+  }, []);
 
   // Calculate tooltip position relative to viewport
   const calculatePosition = useCallback(() => {
@@ -146,6 +159,61 @@ export default function Tooltip({
     }
   };
 
+  // Handle mouse enter - show tooltip with delay and fade-in
+  const handleMouseEnter = useCallback(() => {
+    // Clear any pending timeouts
+    if (showTimeoutRef.current) {
+      clearTimeout(showTimeoutRef.current);
+      showTimeoutRef.current = null;
+    }
+    if (appearanceDelayRef.current) {
+      clearTimeout(appearanceDelayRef.current);
+      appearanceDelayRef.current = null;
+    }
+    if (fadeInTimerRef.current) {
+      clearTimeout(fadeInTimerRef.current);
+      fadeInTimerRef.current = null;
+    }
+
+    // Start delay timer before showing tooltip (350ms delay)
+    appearanceDelayRef.current = setTimeout(() => {
+      setIsVisible(true);
+      // After tooltip renders, trigger fade-in on next frame
+      fadeInTimerRef.current = setTimeout(() => {
+        setIsFadedIn(true);
+      }, 20);  // Small delay to ensure DOM has rendered at opacity 0
+    }, 350);  // Delay before tooltip starts appearing
+  }, []);
+
+  // Handle mouse leave - INSTANTLY hide tooltip, cancel any pending show
+  const handleMouseLeave = useCallback(() => {
+    // Cancel any pending timeouts
+    if (showTimeoutRef.current) {
+      clearTimeout(showTimeoutRef.current);
+      showTimeoutRef.current = null;
+    }
+    if (appearanceDelayRef.current) {
+      clearTimeout(appearanceDelayRef.current);
+      appearanceDelayRef.current = null;
+    }
+    if (fadeInTimerRef.current) {
+      clearTimeout(fadeInTimerRef.current);
+      fadeInTimerRef.current = null;
+    }
+    // Immediately hide - no delay, no animation
+    setIsVisible(false);
+    setIsFadedIn(false);
+  }, []);
+
+  // Handle touch end - hide after delay for mobile
+  const handleTouchEnd = useCallback(() => {
+    showTimeoutRef.current = setTimeout(() => {
+      setIsVisible(false);
+      setIsFadedIn(false);
+      showTimeoutRef.current = null;
+    }, 2000);
+  }, []);
+
   if (!content) return children;
 
   // Tooltip element to be rendered in portal
@@ -157,14 +225,17 @@ export default function Tooltip({
         px-3 py-2 max-w-xs
         bg-bg-tertiary/95 text-white text-sm
         rounded-lg shadow-2xl border border-white/20
-        animate-in fade-in zoom-in-95 duration-150
         pointer-events-none
       "
       style={{
         top: coords.top,
         left: coords.left,
         backdropFilter: 'blur(12px)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.1)'
+        boxShadow: '0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.1)',
+        // Smooth fade-in animation
+        opacity: isFadedIn ? 1 : 0,
+        transform: isFadedIn ? 'scale(1)' : 'scale(0.95)',
+        transition: 'opacity 200ms ease-out, transform 200ms ease-out'
       }}
       role="tooltip"
     >
@@ -185,10 +256,10 @@ export default function Tooltip({
     <div
       ref={containerRef}
       className={`relative inline-flex ${className}`}
-      onMouseEnter={() => setIsVisible(true)}
-      onMouseLeave={() => setIsVisible(false)}
-      onTouchStart={() => setIsVisible(true)}
-      onTouchEnd={() => setTimeout(() => setIsVisible(false), 2000)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onTouchStart={handleMouseEnter}
+      onTouchEnd={handleTouchEnd}
     >
       {children}
 
