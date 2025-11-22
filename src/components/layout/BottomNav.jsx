@@ -17,7 +17,7 @@ export default function BottomNav({ activeTab, onTabChange }) {
           const isActive = activeTab === tab.id;
 
           return (
-            <Tooltip key={tab.id} content={tab.tooltip} position="top">
+            <Tooltip key={tab.id} content={tab.tooltip} position="top" className="flex-1 flex justify-center">
               <button
                 onClick={() => onTabChange(tab.id)}
                 className={`

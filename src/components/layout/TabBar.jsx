@@ -9,11 +9,11 @@ export default function TabBar({
   return (
     <div className={`flex p-1 bg-white/5 rounded-xl ${className}`}>
       {tabs.map((tab) => (
-        <Tooltip key={tab.id} content={tab.tooltip} position="bottom">
+        <Tooltip key={tab.id} content={tab.tooltip} position="bottom" className="flex-1 min-w-0">
           <button
             onClick={() => onTabChange(tab.id)}
             className={`
-              flex-1 py-2.5 px-4 rounded-lg text-sm font-semibold
+              w-full py-2.5 px-4 rounded-lg text-sm font-semibold
               transition-all duration-200
               ${activeTab === tab.id
                 ? 'btn-gradient text-white shadow-glow-primary'

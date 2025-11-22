@@ -67,8 +67,8 @@ export default function BackwardMode({ onResultChange }) {
             Στόχος
           </h3>
         </Tooltip>
-        <Tooltip content="Πόσα ml υγρού θέλετε να φτιάξετε συνολικά. Συνήθως 30, 60 ή 120ml." position="bottom">
-          <div className="w-full">
+        <Tooltip content="Πόσα ml υγρού θέλετε να φτιάξετε συνολικά. Συνήθως 30, 60 ή 120ml." position="bottom" className="w-full block">
+          <div className="w-full mb-4">
             <Slider
               label="Τελικά ml"
               value={targetMl}
@@ -77,12 +77,11 @@ export default function BackwardMode({ onResultChange }) {
               step={5}
               suffix=" ml"
               onChange={(e) => setTargetMl(parseInt(e.target.value))}
-              className="mb-4"
             />
           </div>
         </Tooltip>
-        <Tooltip content="Η περιεκτικότητα νικοτίνης που θέλετε. 3-6mg για DTL, 12-18mg για MTL." position="bottom">
-          <div className="w-full">
+        <Tooltip content="Η περιεκτικότητα νικοτίνης που θέλετε. 3-6mg για DTL, 12-18mg για MTL." position="bottom" className="w-full block">
+          <div className="w-full mb-4">
             <Slider
               label="Νικοτίνη"
               value={targetNicotine}
@@ -91,11 +90,10 @@ export default function BackwardMode({ onResultChange }) {
               step={0.5}
               suffix=" mg/ml"
               onChange={(e) => setTargetNicotine(parseFloat(e.target.value))}
-              className="mb-4"
             />
           </div>
         </Tooltip>
-        <Tooltip content="Η αναλογία PG/VG. Περισσότερο VG = πυκνός ατμός. Περισσότερο PG = δυνατή γεύση." position="bottom">
+        <Tooltip content="Η αναλογία PG/VG. Περισσότερο VG = πυκνός ατμός. Περισσότερο PG = δυνατή γεύση." position="bottom" className="w-full block">
           <div className="w-full">
             <Slider
               label="PG/VG"
@@ -121,17 +119,16 @@ export default function BackwardMode({ onResultChange }) {
             Άρωμα
           </h3>
         </Tooltip>
-        <Tooltip content="Επιλέξτε το άρωμα που θέλετε να χρησιμοποιήσετε" position="bottom">
-          <div className="w-full">
+        <Tooltip content="Επιλέξτε το άρωμα που θέλετε να χρησιμοποιήσετε" position="bottom" className="w-full block">
+          <div className="w-full mb-3">
             <Select
               options={flavorOptions}
               value={selectedFlavor}
               onChange={(e) => setSelectedFlavor(e.target.value)}
-              className="mb-3"
             />
           </div>
         </Tooltip>
-        <Tooltip content="Πόσα ml αρώματος έχετε και θέλετε να χρησιμοποιήσετε. Συνήθως 20-30ml για flavor shot." position="bottom">
+        <Tooltip content="Πόσα ml αρώματος έχετε και θέλετε να χρησιμοποιήσετε. Συνήθως 20-30ml για flavor shot." position="bottom" className="w-full block">
           <div className="w-full">
             <Input
               label="Διαθέσιμη ποσότητα"
@@ -154,17 +151,16 @@ export default function BackwardMode({ onResultChange }) {
             Booster
           </h3>
         </Tooltip>
-        <Tooltip content="Επιλέξτε τον τύπο booster. Διαφορετικά boosters έχουν διαφορετική σύσταση PG/VG." position="bottom">
-          <div className="w-full">
+        <Tooltip content="Επιλέξτε τον τύπο booster. Διαφορετικά boosters έχουν διαφορετική σύσταση PG/VG." position="bottom" className="w-full block">
+          <div className="w-full mb-3">
             <Select
               options={boosterOptions}
               value={selectedBooster}
               onChange={(e) => setSelectedBooster(e.target.value)}
-              className="mb-3"
             />
           </div>
         </Tooltip>
-        <Tooltip content="Ενεργοποιήστε για να χρησιμοποιήσετε ακέραιο αριθμό boosters (πιο πρακτικό)" position="bottom">
+        <Tooltip content="Ενεργοποιήστε για να χρησιμοποιήσετε ακέραιο αριθμό boosters (πιο πρακτικό)" position="bottom" className="w-full block">
           <div className="w-full">
             <Toggle
               label="Μόνο ακέραια τεμάχια"
@@ -178,50 +174,50 @@ export default function BackwardMode({ onResultChange }) {
 
       {/* Αποτέλεσμα υπολογισμού */}
       {calculation && (
-        <Tooltip content="Αυτά είναι τα υλικά που χρειάζεστε για να πετύχετε τον στόχο σας">
-          <Card className="bg-accent-primary/5 border-accent-primary/20">
-            <h3 className="text-sm font-semibold text-accent-primary mb-3">
+        <Card className="bg-accent-primary/5 border-accent-primary/20">
+          <Tooltip content="Αυτά είναι τα υλικά που χρειάζεστε για να πετύχετε τον στόχο σας">
+            <h3 className="text-sm font-semibold text-accent-primary mb-3 cursor-help">
               Χρειάζεσαι
             </h3>
-            <div className="space-y-2">
-              <Tooltip content="Ο αριθμός boosters νικοτίνης που πρέπει να προσθέσετε" position="left">
-                <div className="flex justify-between text-white cursor-help">
-                  <span>Boosters:</span>
-                  <span className="font-bold">
-                    {calculation.boosterCount} τεμ. ({calculation.boosterTotalMl} ml)
-                  </span>
-                </div>
-              </Tooltip>
-              <Tooltip content="Η ποσότητα βάσης PG χωρίς νικοτίνη που πρέπει να προσθέσετε" position="left">
-                <div className="flex justify-between text-white cursor-help">
-                  <span>Βάση PG:</span>
-                  <span className="font-bold">{calculation.basePgMl} ml</span>
-                </div>
-              </Tooltip>
-              <Tooltip content="Η ποσότητα βάσης VG χωρίς νικοτίνη που πρέπει να προσθέσετε" position="left">
-                <div className="flex justify-between text-white cursor-help">
-                  <span>Βάση VG:</span>
-                  <span className="font-bold">{calculation.baseVgMl} ml</span>
-                </div>
-              </Tooltip>
-            </div>
+          </Tooltip>
+          <div className="space-y-2">
+            <Tooltip content="Ο αριθμός boosters νικοτίνης που πρέπει να προσθέσετε" position="left" className="w-full block">
+              <div className="flex justify-between text-white cursor-help">
+                <span>Boosters:</span>
+                <span className="font-bold">
+                  {calculation.boosterCount} τεμ. ({calculation.boosterTotalMl} ml)
+                </span>
+              </div>
+            </Tooltip>
+            <Tooltip content="Η ποσότητα βάσης PG χωρίς νικοτίνη που πρέπει να προσθέσετε" position="left" className="w-full block">
+              <div className="flex justify-between text-white cursor-help">
+                <span>Βάση PG:</span>
+                <span className="font-bold">{calculation.basePgMl} ml</span>
+              </div>
+            </Tooltip>
+            <Tooltip content="Η ποσότητα βάσης VG χωρίς νικοτίνη που πρέπει να προσθέσετε" position="left" className="w-full block">
+              <div className="flex justify-between text-white cursor-help">
+                <span>Βάση VG:</span>
+                <span className="font-bold">{calculation.baseVgMl} ml</span>
+              </div>
+            </Tooltip>
+          </div>
 
-            {calculation.warnings.length > 0 && (
-              <Tooltip content="Αυτές οι προειδοποιήσεις δείχνουν αποκλίσεις από τον στόχο σας" position="top">
-                <div className="mt-3 p-3 rounded-lg bg-warning/10 border border-warning/20">
-                  <div className="flex items-start gap-2">
-                    <AlertCircle className="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
-                    <div className="text-sm text-warning">
-                      {calculation.warnings.map((w, i) => (
-                        <p key={i}>{w}</p>
-                      ))}
-                    </div>
+          {calculation.warnings.length > 0 && (
+            <Tooltip content="Αυτές οι προειδοποιήσεις δείχνουν αποκλίσεις από τον στόχο σας" position="top" className="w-full block">
+              <div className="mt-3 p-3 rounded-lg bg-warning/10 border border-warning/20">
+                <div className="flex items-start gap-2">
+                  <AlertCircle className="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-warning">
+                    {calculation.warnings.map((w, i) => (
+                      <p key={i}>{w}</p>
+                    ))}
                   </div>
                 </div>
-              </Tooltip>
-            )}
-          </Card>
-        </Tooltip>
+              </div>
+            </Tooltip>
+          )}
+        </Card>
       )}
     </div>
   );

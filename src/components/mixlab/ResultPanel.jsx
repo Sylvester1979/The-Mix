@@ -47,7 +47,7 @@ export default function ResultPanel({
 
   return (
     <Card className={`${className}`}>
-      <Tooltip content="Η αναλογία PG/VG του τελικού μείγματος. PG=γεύση/throat hit, VG=ατμός" position="top">
+      <Tooltip content="Η αναλογία PG/VG του τελικού μείγματος. PG=γεύση/throat hit, VG=ατμός" position="top" className="w-full">
         <div className="w-full cursor-help">
           <PgVgBar pgPercent={result.pgPercent} vgPercent={result.vgPercent} />
         </div>
@@ -57,8 +57,8 @@ export default function ResultPanel({
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <Tooltip key={stat.label} content={stat.tooltip} position="top">
-              <div className="text-center p-3 rounded-xl bg-white/5 cursor-help">
+            <Tooltip key={stat.label} content={stat.tooltip} position="top" className="w-full">
+              <div className="w-full text-center p-3 rounded-xl bg-white/5 cursor-help">
                 <Icon className={`w-5 h-5 mx-auto mb-1 ${stat.color}`} />
                 <div className="text-lg font-bold text-white">
                   {stat.value}
@@ -74,10 +74,10 @@ export default function ResultPanel({
       {(onSave || onAddSteep) && (
         <div className="flex gap-2 mt-4">
           {onSave && (
-            <Tooltip content="Αποθηκεύστε αυτή τη συνταγή για να τη χρησιμοποιήσετε ξανά" position="top">
+            <Tooltip content="Αποθηκεύστε αυτή τη συνταγή για να τη χρησιμοποιήσετε ξανά" position="top" className="flex-1 min-w-0">
               <button
                 onClick={onSave}
-                className="flex-1 py-2.5 px-4 rounded-xl bg-white/5 border border-white/10
+                className="w-full py-2.5 px-4 rounded-xl bg-white/5 border border-white/10
                   text-white text-sm font-medium
                   hover:bg-white/10 transition-colors"
               >
@@ -86,10 +86,10 @@ export default function ResultPanel({
             </Tooltip>
           )}
           {onAddSteep && (
-            <Tooltip content="Προσθέστε στην παρακολούθηση ωρίμανσης για να ξέρετε πότε είναι έτοιμο" position="top">
+            <Tooltip content="Προσθέστε στην παρακολούθηση ωρίμανσης για να ξέρετε πότε είναι έτοιμο" position="top" className="flex-1 min-w-0">
               <button
                 onClick={onAddSteep}
-                className="flex-1 py-2.5 px-4 rounded-xl btn-gradient
+                className="w-full py-2.5 px-4 rounded-xl btn-gradient
                   text-white text-sm font-semibold
                   shadow-glow-primary hover:shadow-lg transition-shadow"
               >
