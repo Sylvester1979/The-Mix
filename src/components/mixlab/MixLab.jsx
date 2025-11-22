@@ -6,8 +6,8 @@ import ResultPanel from './ResultPanel';
 import SaveRecipeModal from '../recipes/SaveRecipeModal';
 
 const tabs = [
-  { id: 'forward', label: 'ΕΧΩ' },
-  { id: 'backward', label: 'ΘΕΛΩ' }
+  { id: 'forward', label: 'ΕΧΩ', tooltip: 'Έχω συγκεκριμένα υλικά - υπολόγισε τι υγρό θα βγει' },
+  { id: 'backward', label: 'ΘΕΛΩ', tooltip: 'Θέλω συγκεκριμένο αποτέλεσμα - πες μου τι υλικά χρειάζομαι' }
 ];
 
 export default function MixLab() {

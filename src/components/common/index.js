@@ -8,3 +8,4 @@ export { default as Stepper } from './Stepper';
 export { default as Modal } from './Modal';
 export { default as StarRating } from './StarRating';
 export { default as ProgressBar } from './ProgressBar';
+export { default as Tooltip, TooltipWrapper } from './Tooltip';
