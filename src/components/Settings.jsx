@@ -1,10 +1,12 @@
-import { Download, Upload, RotateCcw, Info } from 'lucide-react';
-import { Modal, Card, Toggle, Select, Slider, Button } from './common';
+import { Download, Upload, RotateCcw, Info, Euro, Trash2, Globe, AlertTriangle } from 'lucide-react';
+import { Modal, Card, Toggle, Select, Slider, Button, Input } from './common';
 import { useApp } from '../context/AppContext';
+import { useState } from 'react';
 
 export default function Settings({ isOpen, onClose }) {
   const { state, dispatch, actions } = useApp();
   const { settings } = state;
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   const updateSetting = (key, value) => {
     dispatch({
@@ -72,16 +74,28 @@ export default function Settings({ isOpen, onClose }) {
           pgvgTolerance: 5,
           defaultNicotine: 6,
           defaultPgVg: [50, 50],
-          defaultSteepDays: 10
+          defaultSteepDays: 10,
+          defaultFlavorPercent: 20,
+          language: 'el'
         }
       });
     }
+  };
+
+  const handleClearAllData = () => {
+    dispatch({ type: actions.CLEAR_ALL_DATA });
+    setShowClearConfirm(false);
   };
 
   const roundMlOptions = [
     { value: 'null', label: 'Καμία' },
     { value: '0.5', label: '0.5 ml' },
     { value: '1', label: '1 ml' }
+  ];
+
+  const languageOptions = [
+    { value: 'el', label: 'Ελληνικά' },
+    { value: 'en', label: 'English (soon)' }
   ];
 
   return (
@@ -92,6 +106,29 @@ export default function Settings({ isOpen, onClose }) {
       size="lg"
     >
       <div className="space-y-6">
+        {/* Γενικά */}
+        <div>
+          <h3 className="text-sm font-semibold text-text-secondary uppercase tracking-wide mb-3">
+            <Globe className="w-4 h-4 inline mr-2" />
+            Γενικά
+          </h3>
+          <Card className="space-y-4">
+            <div>
+              <label className="text-sm text-text-secondary font-medium mb-1.5 block">
+                Γλώσσα
+              </label>
+              <Select
+                options={languageOptions}
+                value={settings.language || 'el'}
+                onChange={(e) => updateSetting('language', e.target.value)}
+              />
+              <p className="text-xs text-text-muted mt-1">
+                Προς το παρόν μόνο Ελληνικά είναι διαθέσιμα
+              </p>
+            </div>
+          </Card>
+        </div>
+
         {/* Υπολογισμοί */}
         <div>
           <h3 className="text-sm font-semibold text-text-secondary uppercase tracking-wide mb-3">
@@ -167,6 +204,74 @@ export default function Settings({ isOpen, onClose }) {
               suffix=" ημ."
               onChange={(e) => updateSetting('defaultSteepDays', parseInt(e.target.value))}
             />
+
+            <Slider
+              label="Ποσοστό αρώματος"
+              value={settings.defaultFlavorPercent || 20}
+              min={5}
+              max={50}
+              step={1}
+              suffix="%"
+              onChange={(e) => updateSetting('defaultFlavorPercent', parseInt(e.target.value))}
+            />
+          </Card>
+        </div>
+
+        {/* Κόστη */}
+        <div>
+          <h3 className="text-sm font-semibold text-text-secondary uppercase tracking-wide mb-3">
+            <Euro className="w-4 h-4 inline mr-2" />
+            Κόστη
+          </h3>
+          <Card className="space-y-4">
+            <Toggle
+              label="Εμφάνιση κόστους"
+              description="Εμφάνιση του κόστους στα αποτελέσματα"
+              checked={settings.showCosts ?? true}
+              onChange={(e) => updateSetting('showCosts', e.target.checked)}
+            />
+
+            <div className="grid grid-cols-2 gap-3">
+              <Input
+                label="Τιμή PG/λίτρο"
+                type="number"
+                value={settings.basePgPricePerLiter ?? 8}
+                onChange={(e) => updateSetting('basePgPricePerLiter', parseFloat(e.target.value) || 0)}
+                suffix="\u20AC"
+                min={0}
+                step={0.5}
+              />
+              <Input
+                label="Τιμή VG/λίτρο"
+                type="number"
+                value={settings.baseVgPricePerLiter ?? 10}
+                onChange={(e) => updateSetting('baseVgPricePerLiter', parseFloat(e.target.value) || 0)}
+                suffix="\u20AC"
+                min={0}
+                step={0.5}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <Input
+                label="Τιμή Booster"
+                type="number"
+                value={settings.defaultBoosterPrice ?? 1.5}
+                onChange={(e) => updateSetting('defaultBoosterPrice', parseFloat(e.target.value) || 0)}
+                suffix="\u20AC"
+                min={0}
+                step={0.1}
+              />
+              <Input
+                label="Τιμή Αρώματος"
+                type="number"
+                value={settings.defaultFlavorPrice ?? 5}
+                onChange={(e) => updateSetting('defaultFlavorPrice', parseFloat(e.target.value) || 0)}
+                suffix="\u20AC"
+                min={0}
+                step={0.5}
+              />
+            </div>
           </Card>
         </div>
 
@@ -202,6 +307,55 @@ export default function Settings({ isOpen, onClose }) {
               <RotateCcw className="w-4 h-4" />
               Επαναφορά ρυθμίσεων
             </Button>
+          </Card>
+        </div>
+
+        {/* Διαχείριση Δεδομένων */}
+        <div>
+          <h3 className="text-sm font-semibold text-text-secondary uppercase tracking-wide mb-3">
+            <Trash2 className="w-4 h-4 inline mr-2" />
+            Διαχείριση Δεδομένων
+          </h3>
+          <Card className="space-y-3">
+            {!showClearConfirm ? (
+              <Button
+                variant="danger"
+                fullWidth
+                onClick={() => setShowClearConfirm(true)}
+              >
+                <Trash2 className="w-4 h-4" />
+                Διαγραφή όλων των δεδομένων
+              </Button>
+            ) : (
+              <div className="p-4 rounded-xl bg-error/10 border border-error/30">
+                <div className="flex items-center gap-2 mb-3">
+                  <AlertTriangle className="w-5 h-5 text-error" />
+                  <span className="font-semibold text-error">Προσοχή!</span>
+                </div>
+                <p className="text-sm text-text-secondary mb-4">
+                  Αυτή η ενέργεια θα διαγράψει όλα τα δεδομένα σας: αποθήκη, συνταγές, ωρίμανση και προσαρμοσμένα προϊόντα. Δεν μπορεί να αναιρεθεί.
+                </p>
+                <div className="flex gap-2">
+                  <Button
+                    variant="secondary"
+                    onClick={() => setShowClearConfirm(false)}
+                    className="flex-1"
+                  >
+                    Ακύρωση
+                  </Button>
+                  <Button
+                    variant="danger"
+                    onClick={handleClearAllData}
+                    className="flex-1"
+                  >
+                    Διαγραφή
+                  </Button>
+                </div>
+              </div>
+            )}
+            <p className="text-xs text-text-muted text-center">
+              Συνιστούμε να εξάγετε τα δεδομένα σας πριν τη διαγραφή
+            </p>
           </Card>
         </div>
 

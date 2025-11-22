@@ -1,9 +1,11 @@
-import { Droplets, Zap, Percent, FlaskConical } from 'lucide-react';
+import { Droplets, Zap, FlaskConical, Euro } from 'lucide-react';
 import { Card, Tooltip } from '../common';
 import PgVgBar from './PgVgBar';
 
 export default function ResultPanel({
   result,
+  costInfo = null,
+  showCosts = true,
   onSave,
   onAddSteep,
   className = ''
@@ -70,6 +72,26 @@ export default function ResultPanel({
           );
         })}
       </div>
+
+      {/* Cost Information */}
+      {showCosts && costInfo && costInfo.totalCost > 0 && (
+        <div className="mt-4 p-3 rounded-xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Euro className="w-4 h-4 text-emerald-400" />
+              <span className="text-sm text-text-secondary">Κόστος</span>
+            </div>
+            <div className="text-right">
+              <div className="text-lg font-bold text-emerald-400">
+                {costInfo.totalCost.toFixed(2)}\u20AC
+              </div>
+              <div className="text-xs text-text-muted">
+                {costInfo.costPer10ml.toFixed(2)}\u20AC / 10ml
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {(onSave || onAddSteep) && (
         <div className="flex gap-2 mt-4">

@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f0f1a"/>
+      <stop offset="100%" style="stop-color:#0a0a0f"/>
+    </linearGradient>
+    <linearGradient id="primary-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8b5cf6"/>
+      <stop offset="100%" style="stop-color:#a855f7"/>
+    </linearGradient>
+    <linearGradient id="flask-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#c084fc"/>
+      <stop offset="60%" style="stop-color:#8b5cf6"/>
+      <stop offset="100%" style="stop-color:#7c3aed"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="url(#bg-gradient)"/>
+
+  <!-- Glow effect -->
+  <circle cx="256" cy="256" r="140" fill="url(#primary-gradient)" opacity="0.15"/>
+
+  <!-- Flask icon -->
+  <g transform="translate(156, 116)">
+    <!-- Flask neck -->
+    <rect x="70" y="0" width="60" height="80" rx="8" fill="#e2e8f0"/>
+
+    <!-- Flask body -->
+    <path d="M70 80 L30 180 Q20 200 30 220 L30 240 Q30 260 50 270 L150 270 Q170 260 170 240 L170 220 Q180 200 170 180 L130 80 Z"
+          fill="url(#flask-gradient)"/>
+
+    <!-- Liquid inside -->
+    <path d="M45 200 Q35 215 45 230 L45 245 Q45 255 55 260 L145 260 Q155 255 155 245 L155 230 Q165 215 155 200 L140 180 Q100 195 60 180 Z"
+          fill="#a855f7" opacity="0.6"/>
+
+    <!-- Bubbles -->
+    <circle cx="80" cy="220" r="8" fill="#fff" opacity="0.4"/>
+    <circle cx="120" cy="235" r="6" fill="#fff" opacity="0.3"/>
+    <circle cx="100" cy="210" r="5" fill="#fff" opacity="0.25"/>
+
+    <!-- Flask highlights -->
+    <path d="M50 190 Q40 205 50 220 L50 235"
+          stroke="#fff" stroke-width="4" fill="none" opacity="0.2" stroke-linecap="round"/>
+  </g>
+
+  <!-- "M" letter -->
+  <text x="256" y="420" text-anchor="middle" font-family="Arial, sans-serif"
+        font-size="72" font-weight="bold" fill="#fff">M</text>
+</svg>

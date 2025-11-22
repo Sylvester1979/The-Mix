@@ -1,13 +1,15 @@
-import { useState, useEffect, useMemo } from 'react';
-import { Card, Select, Input, Stepper, Toggle, Tooltip } from '../common';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { Card, Select, Input, Stepper, Toggle, Tooltip, Button } from '../common';
 import { useApp } from '../../context/AppContext';
 import { calculateForward } from '../../utils/calculations';
+import { X, BookOpen } from 'lucide-react';
 
-export default function ForwardMode({ onResultChange }) {
+export default function ForwardMode({ onResultChange, loadedRecipe, onClearLoadedRecipe }) {
   const { getAllBoosters, getAllFlavors, state } = useApp();
 
   const boosters = getAllBoosters();
   const flavors = getAllFlavors();
+  const hasLoadedRecipeRef = useRef(false);
 
   const [selectedBooster, setSelectedBooster] = useState(boosters[0]?.id || '');
   const [selectedFlavor, setSelectedFlavor] = useState(flavors[0]?.id || '');
@@ -16,6 +18,45 @@ export default function ForwardMode({ onResultChange }) {
   const [basePgMl, setBasePgMl] = useState(0);
   const [baseVgMl, setBaseVgMl] = useState(30);
   const [wholeBoostersOnly, setWholeBoostersOnly] = useState(true);
+
+  // Load recipe data when a recipe is loaded
+  useEffect(() => {
+    if (loadedRecipe && !hasLoadedRecipeRef.current) {
+      hasLoadedRecipeRef.current = true;
+      const { ingredients } = loadedRecipe;
+
+      if (ingredients) {
+        // Load flavor data
+        if (ingredients.flavor?.id) {
+          setSelectedFlavor(ingredients.flavor.id);
+        }
+        if (ingredients.flavor?.volumeMl) {
+          setFlavorMl(ingredients.flavor.volumeMl);
+        }
+
+        // Load booster data
+        if (ingredients.boosters?.id) {
+          setSelectedBooster(ingredients.boosters.id);
+        }
+        if (typeof ingredients.boosters?.count === 'number') {
+          setBoosterCount(ingredients.boosters.count);
+        }
+
+        // Load base data
+        if (typeof ingredients.pgMl === 'number') {
+          setBasePgMl(ingredients.pgMl);
+        }
+        if (typeof ingredients.vgMl === 'number') {
+          setBaseVgMl(ingredients.vgMl);
+        }
+      }
+    }
+
+    // Reset when loadedRecipe becomes null
+    if (!loadedRecipe) {
+      hasLoadedRecipeRef.current = false;
+    }
+  }, [loadedRecipe]);
 
   const booster = useMemo(
     () => boosters.find(b => b.id === selectedBooster) || boosters[0],
@@ -42,8 +83,18 @@ export default function ForwardMode({ onResultChange }) {
   }, [flavorMl, flavor, boosterCount, booster, basePgMl, baseVgMl]);
 
   useEffect(() => {
-    onResultChange?.(result);
-  }, [result, onResultChange]);
+    // Pass both result and ingredients for cost calculation
+    const ingredients = {
+      flavorMl,
+      flavorPrice: flavor?.defaultPrice || 5.00,
+      flavorBottleVolume: flavor?.volumeMl || 30,
+      boosterCount,
+      boosterPrice: booster?.defaultPrice || 1.50,
+      basePgMl,
+      baseVgMl
+    };
+    onResultChange?.(result, ingredients);
+  }, [result, onResultChange, flavorMl, flavor, boosterCount, booster, basePgMl, baseVgMl]);
 
   const boosterOptions = boosters.map(b => ({
     value: b.id,
@@ -71,6 +122,24 @@ export default function ForwardMode({ onResultChange }) {
 
   return (
     <div className="space-y-4">
+      {/* Recipe Loaded Banner */}
+      {loadedRecipe && (
+        <div className="flex items-center justify-between p-3 rounded-xl bg-accent-primary/20 border border-accent-primary/30">
+          <div className="flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-accent-primary" />
+            <span className="text-sm text-white">
+              Φορτώθηκε: <span className="font-semibold">{loadedRecipe.name}</span>
+            </span>
+          </div>
+          <button
+            onClick={onClearLoadedRecipe}
+            className="p-1.5 rounded-lg hover:bg-white/10 transition-colors"
+          >
+            <X className="w-4 h-4 text-text-secondary" />
+          </button>
+        </div>
+      )}
+
       {/* Άρωμα */}
       <Card>
         <Tooltip content="Επιλέξτε το άρωμα που θα χρησιμοποιήσετε και την ποσότητά του σε ml">

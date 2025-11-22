@@ -1,4 +1,5 @@
 import { Minus, Plus } from 'lucide-react';
+import { useState, useCallback } from 'react';
 
 export default function Stepper({
   value = 0,
@@ -9,26 +10,43 @@ export default function Stepper({
   label,
   suffix = '',
   size = 'md',
+  haptic = true,
   className = ''
 }) {
-  const handleDecrease = () => {
-    const newValue = Math.max(min, value - step);
-    onChange?.(newValue);
-  };
+  const [isAnimating, setIsAnimating] = useState(null); // 'increase' | 'decrease' | null
 
-  const handleIncrease = () => {
+  const handleDecrease = useCallback(() => {
+    const newValue = Math.max(min, value - step);
+    if (newValue !== value) {
+      setIsAnimating('decrease');
+      onChange?.(newValue);
+      if (haptic && navigator.vibrate) {
+        navigator.vibrate(10);
+      }
+      setTimeout(() => setIsAnimating(null), 150);
+    }
+  }, [value, min, step, onChange, haptic]);
+
+  const handleIncrease = useCallback(() => {
     const newValue = Math.min(max, value + step);
-    onChange?.(newValue);
-  };
+    if (newValue !== value) {
+      setIsAnimating('increase');
+      onChange?.(newValue);
+      if (haptic && navigator.vibrate) {
+        navigator.vibrate(10);
+      }
+      setTimeout(() => setIsAnimating(null), 150);
+    }
+  }, [value, max, step, onChange, haptic]);
 
   const sizes = {
     sm: {
-      button: 'w-8 h-8',
+      button: 'w-9 h-9',
       icon: 'w-4 h-4',
       value: 'text-lg min-w-[60px]'
     },
     md: {
-      button: 'w-11 h-11',
+      button: 'w-12 h-12',
       icon: 'w-5 h-5',
       value: 'text-xl min-w-[80px]'
     },
@@ -48,7 +66,8 @@ export default function Stepper({
           {label}
         </label>
       )}
-      <div className="flex items-center justify-center gap-3">
+      <div className="flex items-center justify-center gap-4">
+        {/* Decrease button */}
         <button
           type="button"
           onClick={handleDecrease}
@@ -56,19 +75,34 @@ export default function Stepper({
           className={`
             ${s.button} rounded-xl bg-white/5 border border-white/10
             flex items-center justify-center
-            transition-all duration-200
-            hover:bg-white/10 active:scale-95
-            disabled:opacity-30 disabled:cursor-not-allowed
+            transition-all duration-150 ease-out
+            hover:bg-white/10 hover:border-white/15 hover:scale-105
+            active:scale-95 active:bg-white/15
+            disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:bg-white/5
+            focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50
+            group
           `}
         >
-          <Minus className={`${s.icon} text-white`} />
+          <Minus className={`
+            ${s.icon} text-white
+            transition-transform duration-150
+            group-hover:scale-110
+            group-active:scale-90
+          `} />
         </button>
 
-        <div className={`${s.value} font-bold text-white text-center`}>
-          {value}
-          {suffix && <span className="text-sm text-text-secondary ml-1">{suffix}</span>}
+        {/* Value display */}
+        <div className={`
+          ${s.value} font-bold text-white text-center
+          transition-transform duration-150 ease-out
+          ${isAnimating === 'increase' ? 'scale-110' : ''}
+          ${isAnimating === 'decrease' ? 'scale-90' : ''}
+        `}>
+          <span className="tabular-nums">{value}</span>
+          {suffix && <span className="text-sm text-text-secondary ml-1 font-medium">{suffix}</span>}
         </div>
 
+        {/* Increase button */}
         <button
           type="button"
           onClick={handleIncrease}
@@ -77,12 +111,20 @@ export default function Stepper({
             ${s.button} rounded-xl btn-gradient
             flex items-center justify-center
             shadow-glow-primary
-            transition-all duration-200
-            hover:shadow-lg active:scale-95
-            disabled:opacity-30 disabled:cursor-not-allowed disabled:shadow-none
+            transition-all duration-150 ease-out
+            hover:shadow-glow-primary-lg hover:scale-105 hover:brightness-110
+            active:scale-95 active:brightness-95
+            disabled:opacity-30 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:scale-100
+            focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50
+            group
           `}
         >
-          <Plus className={`${s.icon} text-white`} />
+          <Plus className={`
+            ${s.icon} text-white
+            transition-transform duration-150
+            group-hover:scale-110 group-hover:rotate-90
+            group-active:scale-90
+          `} />
         </button>
       </div>
     </div>

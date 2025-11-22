@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Plus, Search, Package, Droplet, FlaskConical } from 'lucide-react';
+import { Plus, Search, Package, Droplet, FlaskConical, Filter, X } from 'lucide-react';
 import { Card, Input, Button } from '../common';
 import { useApp } from '../../context/AppContext';
 import InventorySection from './InventorySection';
 import AddItemModal from './AddItemModal';
+import { FLAVOR_PROFILES } from '../../data/flavors';
 
 export default function Inventory() {
   const { state, dispatch, actions, getAllBoosters, getAllFlavors } = useApp();
@@ -12,6 +13,8 @@ export default function Inventory() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [addType, setAddType] = useState('booster');
+  const [selectedProfile, setSelectedProfile] = useState(null);
+  const [showProfileFilter, setShowProfileFilter] = useState(false);
 
   const boosters = getAllBoosters();
   const flavors = getAllFlavors();
@@ -27,14 +30,27 @@ export default function Inventory() {
     return { ...item, product };
   }).filter(item => item.product);
 
-  // Filter by search
-  const filterBySearch = (items) => {
-    if (!searchQuery) return items;
-    const query = searchQuery.toLowerCase();
-    return items.filter(item =>
-      item.product?.name?.toLowerCase().includes(query) ||
-      item.product?.brand?.toLowerCase().includes(query)
-    );
+  // Filter by search and profile
+  const filterItems = (items, checkProfiles = false) => {
+    let filtered = items;
+
+    // Filter by search
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(item =>
+        item.product?.name?.toLowerCase().includes(query) ||
+        item.product?.brand?.toLowerCase().includes(query)
+      );
+    }
+
+    // Filter by flavor profile (only for flavors)
+    if (checkProfiles && selectedProfile) {
+      filtered = filtered.filter(item =>
+        item.product?.profiles?.includes(selectedProfile)
+      );
+    }
+
+    return filtered;
   };
 
   const handleAddItem = (type) => {
@@ -80,20 +96,79 @@ export default function Inventory() {
         </Button>
       </div>
 
-      <Input
-        type="text"
-        placeholder="Αναζήτηση..."
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        prefix={<Search className="w-5 h-5" />}
-        className="mb-4"
-      />
+      <div className="flex gap-2 mb-4">
+        <Input
+          type="text"
+          placeholder="Αναζήτηση..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          prefix={<Search className="w-5 h-5" />}
+          className="flex-1"
+        />
+        <button
+          onClick={() => setShowProfileFilter(!showProfileFilter)}
+          className={`p-2.5 rounded-xl transition-colors ${
+            showProfileFilter || selectedProfile
+              ? 'bg-accent-primary text-white'
+              : 'bg-white/5 text-text-secondary hover:bg-white/10'
+          }`}
+        >
+          <Filter className="w-5 h-5" />
+        </button>
+      </div>
+
+      {/* Flavor Profile Filter */}
+      {showProfileFilter && (
+        <div className="mb-4 p-3 rounded-xl bg-white/5">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium text-text-secondary">Φίλτρο κατηγορίας γεύσης</span>
+            {selectedProfile && (
+              <button
+                onClick={() => setSelectedProfile(null)}
+                className="text-xs text-accent-primary hover:text-accent-primary/80"
+              >
+                Καθαρισμός
+              </button>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {Object.values(FLAVOR_PROFILES).map(profile => (
+              <button
+                key={profile.id}
+                onClick={() => setSelectedProfile(
+                  selectedProfile === profile.id ? null : profile.id
+                )}
+                className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
+                  selectedProfile === profile.id
+                    ? 'bg-accent-primary text-white'
+                    : 'bg-white/5 text-text-secondary hover:bg-white/10'
+                }`}
+              >
+                {profile.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Selected filter badge */}
+      {selectedProfile && !showProfileFilter && (
+        <div className="mb-4 flex items-center gap-2">
+          <span className="text-sm text-text-muted">Φίλτρο:</span>
+          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-accent-primary/20 text-accent-primary text-sm">
+            {FLAVOR_PROFILES[selectedProfile]?.name}
+            <button onClick={() => setSelectedProfile(null)}>
+              <X className="w-3 h-3" />
+            </button>
+          </span>
+        </div>
+      )}
 
       {/* Boosters Section */}
       <InventorySection
         title="Boosters"
         icon={Package}
-        items={filterBySearch(boosterItems)}
+        items={filterItems(boosterItems)}
         onUpdateQuantity={(productId, qty) => handleUpdateQuantity('boosters', productId, qty)}
         onAdd={() => handleAddItem('booster')}
         emptyMessage="Δεν έχετε boosters στην αποθήκη"
@@ -142,10 +217,13 @@ export default function Inventory() {
       <InventorySection
         title="Αρώματα"
         icon={FlaskConical}
-        items={filterBySearch(flavorItems)}
+        items={filterItems(flavorItems, true)}
         onUpdateQuantity={(productId, qty) => handleUpdateQuantity('flavors', productId, qty)}
         onAdd={() => handleAddItem('flavor')}
-        emptyMessage="Δεν έχετε αρώματα στην αποθήκη"
+        emptyMessage={selectedProfile
+          ? `Δεν βρέθηκαν αρώματα με κατηγορία "${FLAVOR_PROFILES[selectedProfile]?.name}"`
+          : "Δεν έχετε αρώματα στην αποθήκη"
+        }
       />
 
       <AddItemModal

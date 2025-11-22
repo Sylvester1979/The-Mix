@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, BookOpen } from 'lucide-react';
 import { Input, Button } from '../common';
 import { useApp } from '../../context/AppContext';
 import RecipeCard from './RecipeCard';
 import RecipeDetail from './RecipeDetail';
+import AddSteepModal from '../steep/AddSteepModal';
 
 export default function Recipes() {
   const { state, dispatch, actions } = useApp();
@@ -11,6 +12,7 @@ export default function Recipes() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRecipe, setSelectedRecipe] = useState(null);
+  const [showSteepModal, setShowSteepModal] = useState(false);
 
   // Filter recipes by search
   const filteredRecipes = recipes.filter(recipe => {
@@ -37,6 +39,18 @@ export default function Recipes() {
     });
   };
 
+  const handleMakeAgain = (recipe) => {
+    dispatch({
+      type: actions.LOAD_RECIPE_TO_LAB,
+      payload: recipe
+    });
+    setSelectedRecipe(null);
+  };
+
+  const handleStartSteep = () => {
+    setShowSteepModal(true);
+  };
+
   return (
     <div className="px-4 py-4">
       <div className="flex items-center justify-between mb-4">
@@ -58,14 +72,25 @@ export default function Recipes() {
       {sortedRecipes.length === 0 ? (
         <div className="text-center py-12">
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-white/5 flex items-center justify-center">
-            <Plus className="w-8 h-8 text-text-muted" />
+            <BookOpen className="w-8 h-8 text-text-muted" />
           </div>
           <p className="text-text-secondary mb-2">
             {searchQuery ? 'Δεν βρέθηκαν συνταγές' : 'Δεν έχετε αποθηκεύσει συνταγές'}
           </p>
-          <p className="text-text-muted text-sm">
-            Δημιουργήστε ένα mix στο Lab και αποθηκεύστε το!
+          <p className="text-text-muted text-sm mb-4">
+            {searchQuery
+              ? 'Δοκιμάστε διαφορετική αναζήτηση'
+              : 'Δημιουργήστε ένα mix στο Lab και αποθηκεύστε το!'
+            }
           </p>
+          {!searchQuery && (
+            <Button
+              variant="primary"
+              onClick={() => dispatch({ type: actions.SET_ACTIVE_TAB, payload: 'mixlab' })}
+            >
+              Πήγαινε στο Lab
+            </Button>
+          )}
         </div>
       ) : (
         <div className="space-y-3">
@@ -86,6 +111,14 @@ export default function Recipes() {
         onClose={() => setSelectedRecipe(null)}
         onDelete={() => handleDelete(selectedRecipe?.id)}
         onUpdateRating={(rating) => handleUpdateRating(selectedRecipe?.id, rating)}
+        onMakeAgain={() => handleMakeAgain(selectedRecipe)}
+        onStartSteep={handleStartSteep}
+      />
+
+      <AddSteepModal
+        isOpen={showSteepModal}
+        onClose={() => setShowSteepModal(false)}
+        prefillRecipe={selectedRecipe}
       />
     </div>
   );

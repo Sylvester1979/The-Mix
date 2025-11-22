@@ -216,6 +216,17 @@ export default function Tooltip({
 
   if (!content) return children;
 
+  // Get transform origin based on position for better animation
+  const getTransformOrigin = () => {
+    switch (tooltipPosition) {
+      case 'top': return 'bottom center';
+      case 'bottom': return 'top center';
+      case 'left': return 'right center';
+      case 'right': return 'left center';
+      default: return 'center';
+    }
+  };
+
   // Tooltip element to be rendered in portal
   const tooltipElement = isVisible ? (
     <div
@@ -223,19 +234,21 @@ export default function Tooltip({
       className="
         fixed z-[99999]
         px-3 py-2 max-w-xs
-        bg-bg-tertiary/95 text-white text-sm
-        rounded-lg shadow-2xl border border-white/20
+        bg-bg-tertiary/95 text-white text-sm font-medium
+        rounded-xl shadow-2xl border border-white/10
         pointer-events-none
       "
       style={{
         top: coords.top,
         left: coords.left,
-        backdropFilter: 'blur(12px)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.1)',
-        // Smooth fade-in animation
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.08), inset 0 1px 1px rgba(255,255,255,0.05)',
+        // Smooth fade-in animation with position-aware origin
         opacity: isFadedIn ? 1 : 0,
-        transform: isFadedIn ? 'scale(1)' : 'scale(0.95)',
-        transition: 'opacity 200ms ease-out, transform 200ms ease-out'
+        transform: isFadedIn ? 'scale(1) translateY(0)' : 'scale(0.9) translateY(4px)',
+        transformOrigin: getTransformOrigin(),
+        transition: 'opacity 200ms cubic-bezier(0.16, 1, 0.3, 1), transform 200ms cubic-bezier(0.16, 1, 0.3, 1)'
       }}
       role="tooltip"
     >

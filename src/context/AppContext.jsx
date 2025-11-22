@@ -25,7 +25,13 @@ const initialState = {
     pgvgTolerance: 5,
     defaultNicotine: 6,
     defaultPgVg: [50, 50],
-    defaultSteepDays: 10
+    defaultSteepDays: 10,
+    // Cost tracking settings
+    showCosts: true,
+    basePgPricePerLiter: 8.00,
+    baseVgPricePerLiter: 10.00,
+    defaultBoosterPrice: 1.50,
+    defaultFlavorPrice: 5.00
   },
 
   // Custom Products
@@ -33,7 +39,10 @@ const initialState = {
   customFlavors: [],
 
   // UI State
-  activeTab: 'mixlab'
+  activeTab: 'mixlab',
+
+  // Loaded recipe for "Make Again" feature
+  loadedRecipe: null
 };
 
 // Action types
@@ -58,7 +67,12 @@ const ACTIONS = {
 
   SET_ACTIVE_TAB: 'SET_ACTIVE_TAB',
 
-  LOAD_STATE: 'LOAD_STATE'
+  LOAD_STATE: 'LOAD_STATE',
+
+  // New actions
+  LOAD_RECIPE_TO_LAB: 'LOAD_RECIPE_TO_LAB',
+  CLEAR_LOADED_RECIPE: 'CLEAR_LOADED_RECIPE',
+  CLEAR_ALL_DATA: 'CLEAR_ALL_DATA'
 };
 
 // Reducer
@@ -167,6 +181,22 @@ function appReducer(state, action) {
 
     case ACTIONS.SET_ACTIVE_TAB:
       return { ...state, activeTab: action.payload };
+
+    case ACTIONS.LOAD_RECIPE_TO_LAB:
+      return {
+        ...state,
+        loadedRecipe: action.payload,
+        activeTab: 'mixlab'
+      };
+
+    case ACTIONS.CLEAR_LOADED_RECIPE:
+      return { ...state, loadedRecipe: null };
+
+    case ACTIONS.CLEAR_ALL_DATA:
+      return {
+        ...initialState,
+        settings: state.settings // Keep settings
+      };
 
     default:
       return state;

@@ -45,8 +45,18 @@ export default function BackwardMode({ onResultChange }) {
   }, [targetMl, targetNicotine, targetPgPercent, flavorMl, flavor, booster, roundBoosters]);
 
   useEffect(() => {
-    onResultChange?.(calculation?.result || null);
-  }, [calculation, onResultChange]);
+    // Pass both result and ingredients for cost calculation
+    const ingredients = calculation ? {
+      flavorMl,
+      flavorPrice: flavor?.defaultPrice || 5.00,
+      flavorBottleVolume: flavor?.volumeMl || 30,
+      boosterCount: calculation.boosterCount,
+      boosterPrice: booster?.defaultPrice || 1.50,
+      basePgMl: calculation.basePgMl,
+      baseVgMl: calculation.baseVgMl
+    } : null;
+    onResultChange?.(calculation?.result || null, ingredients);
+  }, [calculation, onResultChange, flavorMl, flavor, booster]);
 
   const boosterOptions = boosters.map(b => ({
     value: b.id,
