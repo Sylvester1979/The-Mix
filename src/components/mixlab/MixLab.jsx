@@ -4,6 +4,7 @@ import ForwardMode from './ForwardMode';
 import BackwardMode from './BackwardMode';
 import ResultPanel from './ResultPanel';
 import SaveRecipeModal from '../recipes/SaveRecipeModal';
+import AddSteepModal from '../steep/AddSteepModal';
 
 const tabs = [
   { id: 'forward', label: 'ΕΧΩ', tooltip: 'Έχω συγκεκριμένα υλικά - υπολόγισε τι υγρό θα βγει' },
@@ -14,6 +15,7 @@ export default function MixLab() {
   const [activeMode, setActiveMode] = useState('forward');
   const [result, setResult] = useState(null);
   const [showSaveModal, setShowSaveModal] = useState(false);
+  const [showSteepModal, setShowSteepModal] = useState(false);
 
   const handleResultChange = useCallback((newResult) => {
     setResult(newResult);
@@ -24,8 +26,7 @@ export default function MixLab() {
   };
 
   const handleAddSteep = () => {
-    // TODO: Open steep modal with result data
-    console.log('Add to steep tracker:', result);
+    setShowSteepModal(true);
   };
 
   return (
@@ -54,6 +55,11 @@ export default function MixLab() {
         isOpen={showSaveModal}
         onClose={() => setShowSaveModal(false)}
         result={result}
+      />
+
+      <AddSteepModal
+        isOpen={showSteepModal}
+        onClose={() => setShowSteepModal(false)}
       />
     </div>
   );
