@@ -75,12 +75,17 @@ export default function Tooltip({
         <div
           ref={tooltipRef}
           className={`
-            absolute z-50 ${positionClasses[tooltipPosition]}
+            absolute z-[9999] ${positionClasses[tooltipPosition]}
             px-3 py-2 max-w-xs
             bg-bg-tertiary text-white text-sm
-            rounded-lg shadow-lg border border-white/10
+            rounded-lg shadow-2xl border border-white/20
             animate-in fade-in zoom-in-95 duration-150
+            pointer-events-none
           `}
+          style={{
+            backdropFilter: 'blur(12px)',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.1)'
+          }}
           role="tooltip"
         >
           {content}
