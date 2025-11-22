@@ -47,7 +47,7 @@ export default function MixLab() {
         result={result}
         onSave={result?.totalMl > 0 ? handleSave : null}
         onAddSteep={result?.totalMl > 0 ? handleAddSteep : null}
-        className="mt-4 sticky bottom-20"
+        className="mt-4"
       />
 
       <SaveRecipeModal
